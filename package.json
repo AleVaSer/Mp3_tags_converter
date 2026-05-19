@@ -5,11 +5,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.26.1",
+    "axios": "^1.6.0",
     "body-parser": "^1.19.2",
     "detect-file-encoding-and-language": "^2.1.0",
     "express": "^4.17.2",
@@ -17,7 +18,14 @@
     "iconv-lite": "^0.6.3",
     "jschardet": "^3.0.0",
     "node-id3": "^0.2.3",
-    "telegram-bot-api": "^2.0.1"
+    "node-telegram-bot-api": "^0.67.0"
   },
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.8.0",
+    "@types/node-telegram-bot-api": "^0.64.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  }
 }

@@ -1,18 +1,18 @@
-const express = require('express');
-const fileSystem = require('fs');
-const tgBotApi = require('telegram-bot-api');
-const cfg = require('../config/config');
-const axios = require('axios');
-const id3Reader = require('node-id3');
-const iconv = require('iconv-lite');
-const encodingDetector = require('jschardet');
+import type { Request, Response, NextFunction } from 'express'
+import fileSystem from 'fs'
+import TelegramBot from 'node-telegram-bot-api'
+import cfg from '../config/cfg.js'
+import axios from 'axios'
+import id3Reader from 'node-id3'
+import iconv from 'iconv-lite'
+import encodingDetector from 'jschardet'
 
-const bot = new tgBotApi({
-    'token' : cfg.token
-});
+const bot = new TelegramBot(
+     cfg.token
+);
 //https://api.telegram.org/bot5052028419:AAFXpGBLZmzHBGuIcCYx-kgAQwZ_M7QHXT0/setWebhook?url=https://cdd7-78-158-202-140.ngrok.io/telegram/bot
-module.exports = {
-    async logger(req, res, next){
+const middleware = {
+    async logger (req: Request, res: Response, next:NextFunction) {
         let toAppend = JSON.stringify(req.body);
         await fileSystem.promises.appendFile('./miscellaneous/log.json', toAppend + ',\n');
 
@@ -20,19 +20,20 @@ module.exports = {
             res.locals.chat_id = req.body.message.chat.id;
             res.locals.file_id = req.body.message?.document?.file_id ?? req.body.message?.audio?.file_id;
             res.locals.file_name = req.body.message?.document?.file_name ?? req.body.message?.audio?.file_name;
-        };
+        }
+        ;
 
         next();
     },
     //https://api.telegram.org/file/bot<token>/<file_path>
-    async downloader(req, res, next){
+    async downloader (req: Request, res: Response, next:NextFunction) {
         if (res.locals.file_id != null) {
             try {
-                bot.sendMessage({
-                    chat_id: res.locals.chat_id,
-                    text: 'Аудио-файл получен. Начинаю обработку. Ожидайте.'
-                });
-                let filePathFromTelegram = await bot.getFile({file_id: res.locals.file_id});
+                await bot.sendMessage(
+                  res.locals.chat_id,
+                  'Аудио-файл получен. Начинаю обработку. Ожидайте.'
+                );
+                let filePathFromTelegram = await bot.getFile(res.locals.file_id);
                 let filePath = filePathFromTelegram.file_path;
                 let url = `https://api.telegram.org/file/bot${cfg.token}/${filePath}`;
                 res.locals.file_path = `./miscellaneous/downloadedFiles/${res.locals.chat_id}+${res.locals.file_name}`;
@@ -51,17 +52,18 @@ module.exports = {
                     });
                 });
             } catch (err) {
-                bot.sendMessage({
-                    chat_id: res.locals.chat_id,
-                    text: 'Ошибка'
-                });
+                await bot.sendMessage(
+                  res.locals.chat_id,
+                  'Ошибка'
+                );
                 console.log(err);
             }
-        };
+        }
+        ;
         next();
     },
 
-    async mp3NameFixer(req, res, next) {
+    async mp3NameFixer (req: Request, res: Response, next:NextFunction) {
         try {
             if (res.locals.file_id != null) {
                 let fileContents = fileSystem.readFileSync(res.locals.file_path)
@@ -77,23 +79,23 @@ module.exports = {
                 id3Reader.update(JSON.parse(decodedMP3TagsV1), res.locals.file_path)
                 id3Reader.update(JSON.parse(decodedMP3TagsV2), res.locals.file_path, options)
 
-                await bot.sendAudio({
-                    chat_id: res.locals.chat_id,
-                    caption: 'Кодировка изменена',
-                    audio: fileSystem.createReadStream(`./${res.locals.file_path}`)
-                })
+                await bot.sendAudio(
+                    res.locals.chat_id,
+                    fileSystem.createReadStream(`./${res.locals.file_path}`),
+                    {caption: 'Кодировка изменена'}
+                )
 
                 fileSystem.unlinkSync(`./${res.locals.file_path}`)
             }
         } catch (err) {
-            bot.sendMessage({
-                chat_id: res.locals.chat_id,
-                text: 'Ошибка'
-            });
+            await bot.sendMessage(
+              res.locals.chat_id,
+              'Ошибка'
+            );
             console.log(err);
         }
 
         next();
     }
 }
-
+export default middleware

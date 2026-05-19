@@ -5,4 +5,10 @@ module.exports = {
             message: "Post-request logged"
         });
     },
+    async Respond_Error_logger(req, res) {
+        res.status(404).json({
+            status: "error",
+            message: "Post-request failed"
+        });
+    },
 }
