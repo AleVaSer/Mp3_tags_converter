@@ -10,7 +10,6 @@ const encodingDetector = require('jschardet');
 const bot = new tgBotApi({
     'token' : cfg.token
 });
-//https://api.telegram.org/bot5052028419:AAFXpGBLZmzHBGuIcCYx-kgAQwZ_M7QHXT0/setWebhook?url=https://cdd7-78-158-202-140.ngrok.io/telegram/bot
 module.exports = {
     async logger(req, res, next){
         let toAppend = JSON.stringify(req.body);
