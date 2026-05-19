@@ -1,4 +1,4 @@
-asdasd# TG MP3 Tags Converter
+TG MP3 Tags Converter
 
 Telegram-бот для автоматической перекодировки тегов MP3 файлов из кириллических кодировок (cp1251 и др.) в UTF-8.
 
