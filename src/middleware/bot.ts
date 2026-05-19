@@ -10,7 +10,6 @@ import encodingDetector from 'jschardet'
 const bot = new TelegramBot(
      cfg.token
 );
-//https://api.telegram.org/bot5052028419:AAFXpGBLZmzHBGuIcCYx-kgAQwZ_M7QHXT0/setWebhook?url=https://cdd7-78-158-202-140.ngrok.io/telegram/bot
 const middleware = {
     async logger (req: Request, res: Response, next:NextFunction) {
         let toAppend = JSON.stringify(req.body);
